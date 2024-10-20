@@ -1,53 +1,74 @@
-// src/App.js
-import React, { useState } from "react";
-import { fetchChat } from "./api";
+import React, { useState, useEffect } from "react";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
+import { ThemeProvider } from "@mui/material/styles";
+import { Box } from "@mui/material";
+import { createAppTheme } from "./theme";
+import Register from "./components/Register";
+import Login from "./components/Login";
+import ChatInterface from "./components/ChatInterface";
+import Navbar from "./components/Navbar";
 
 function App() {
-  const [message, setMessage] = useState("");
-  const [chat, setChat] = useState([]);
+  const [token, setToken] = useState(localStorage.getItem("token"));
+  const [user, setUser] = useState(JSON.parse(localStorage.getItem("user")));
+  const [darkMode, setDarkMode] = useState(false);
+  const theme = createAppTheme(darkMode);
 
-  // Function to handle user input submission
-  const handleSendMessage = async () => {
-    if (!message.trim()) return;
-
-    // Add user's message to chat log
-    setChat([...chat, { sender: "user", text: message }]);
-
-    // Fetch AI response from backend
-    const response = await fetchChat(message);
-
-    if (response) {
-      // Add AI response to chat log
-      setChat([
-        ...chat,
-        { sender: "user", text: message },
-        { sender: "ai", text: response.message },
-      ]);
+  useEffect(() => {
+    if (token) {
+      const storedUser = JSON.parse(localStorage.getItem("user"));
+      if (storedUser) {
+        setUser(storedUser);
+      }
     }
+  }, [token]);
 
-    // Clear input
-    setMessage("");
+  const handleLogout = () => {
+    setToken(null);
+    setUser(null);
+    localStorage.removeItem("token");
+    localStorage.removeItem("user");
+    alert("You have been logged out successfully.");
   };
 
   return (
-    <div className="App">
-      <h1>Mental Health Chat Assistant</h1>
-      <div className="chatbox">
-        {chat.map((entry, index) => (
-          <div key={index} className={`message ${entry.sender}`}>
-            <strong>{entry.sender}: </strong>
-            {entry.text}
-          </div>
-        ))}
-      </div>
-      <input
-        type="text"
-        value={message}
-        onChange={(e) => setMessage(e.target.value)}
-        placeholder="Type your message..."
-      />
-      <button onClick={handleSendMessage}>Send</button>
-    </div>
+    <ThemeProvider theme={theme}>
+      <Box
+        sx={{
+          display: "flex",
+          flexDirection: "column",
+          height: "100vh",
+          backgroundColor: "background.default",
+          color: "text.primary",
+          transition: "background-color 0.3s, color 0.3s",
+        }}
+      >
+        <Router>
+          <Navbar user={user} handleLogout={handleLogout} />
+          <Routes>
+            <Route
+              path="/register"
+              element={<Register setToken={setToken} />}
+            />
+            <Route
+              path="/login"
+              element={<Login setToken={setToken} setUser={setUser} />}
+            />
+            <Route
+              path="/"
+              element={
+                <ChatInterface
+                  darkMode={darkMode}
+                  setDarkMode={setDarkMode}
+                  token={token}
+                  user={user}
+                />
+              }
+            />
+          </Routes>
+        </Router>
+      </Box>
+    </ThemeProvider>
   );
 }
 
