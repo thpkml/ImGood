@@ -40,7 +40,13 @@ const StyledTypography = styled(Typography)(({ theme, sender }) => ({
 
 function ChatMessages({ chat, isLoading }) {
   return (
-    <Box sx={{ flexGrow: 1, overflowY: "auto", mb: 2, mt: 4 }}>
+    <Box
+      sx={{
+        flexGrow: 1,
+        overflowY: "auto",
+        mb: 2,
+      }}
+    >
       <ScrollToBottom
         className="chatbox"
         style={{ flexGrow: 1, overflowY: "auto", marginBottom: "20px" }}

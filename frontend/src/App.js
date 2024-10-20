@@ -34,36 +34,27 @@ function App() {
   return (
     <ThemeProvider theme={theme}>
       <Box
-        sx={{
-          display: "flex",
-          flexDirection: "column",
-          height: "100vh",
-          backgroundColor: "background.default",
-          color: "text.primary",
-          transition: "background-color 0.3s, color 0.3s",
-        }}
+        sx={{ display: "flex", flexDirection: "column", minHeight: "100vh" }}
       >
         <Router>
-          <Navbar user={user} handleLogout={handleLogout} />
+          <Navbar
+            user={user}
+            handleLogout={handleLogout}
+            darkMode={darkMode}
+            setDarkMode={setDarkMode}
+          />
           <Routes>
-            <Route
-              path="/register"
-              element={<Register setToken={setToken} />}
-            />
             <Route
               path="/login"
               element={<Login setToken={setToken} setUser={setUser} />}
             />
             <Route
+              path="/register"
+              element={<Register setToken={setToken} setUser={setUser} />}
+            />
+            <Route
               path="/"
-              element={
-                <ChatInterface
-                  darkMode={darkMode}
-                  setDarkMode={setDarkMode}
-                  token={token}
-                  user={user}
-                />
-              }
+              element={<ChatInterface token={token} user={user} />}
             />
           </Routes>
         </Router>

@@ -14,27 +14,56 @@ export const login = async (email, password) => {
   return response.data;
 };
 
-export const fetchChat = async (message) => {
+export const fetchChat = async (message, conversationId = null) => {
   const token = localStorage.getItem("token");
-  console.log("Token from localStorage:", token); // Debugging line
-
   if (!token) {
     throw new Error("No authentication token found. Please log in.");
   }
-
   try {
-    console.log("Sending request with token:", token); // Debugging line
     const response = await axios.post(
       `${API_URL}/chat`,
-      { message },
+      { message, conversationId },
       { headers: { "x-auth-token": token } }
     );
     return response.data;
   } catch (error) {
-    console.error("Error in fetchChat:", error.response || error); // More detailed error logging
-    if (error.response && error.response.status === 401) {
-      throw new Error("Your session has expired. Please log in again.");
-    }
+    console.error("Error in fetchChat:", error.response || error);
     throw error;
   }
+};
+
+export const getConversations = async () => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(`${API_URL}/chat/conversations`, {
+    headers: { "x-auth-token": token },
+  });
+  return response.data;
+};
+
+export const getConversation = async (conversationId) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.get(
+    `${API_URL}/chat/conversations/${conversationId}`,
+    {
+      headers: { "x-auth-token": token },
+    }
+  );
+  return response.data;
+};
+
+export const updateConversation = async (conversationId, topic) => {
+  const token = localStorage.getItem("token");
+  const response = await axios.put(
+    `${API_URL}/chat/conversations/${conversationId}`,
+    { topic },
+    { headers: { "x-auth-token": token } }
+  );
+  return response.data;
+};
+
+export const deleteConversation = async (conversationId) => {
+  const token = localStorage.getItem("token");
+  await axios.delete(`${API_URL}/chat/conversations/${conversationId}`, {
+    headers: { "x-auth-token": token },
+  });
 };
